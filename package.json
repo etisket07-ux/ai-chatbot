@@ -1,0 +1,44 @@
+{
+  "name": "ai-chatbot",
+  "version": "1.0.0",
+  "description": "AI-powered chatbot with Claude API, Next.js, Hono, and MongoDB",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write .",
+    "type-check": "tsc --noEmit",
+    "test": "echo \"Testing not yet configured\""
+  },
+  "keywords": [
+    "next.js",
+    "claude-api",
+    "chatbot",
+    "mongodb"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.100.1",
+    "hono": "^4.12.23",
+    "mongoose": "^9.6.3",
+    "next": "^16.2.6",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "@typescript-eslint/eslint-plugin": "^8.60.0",
+    "@typescript-eslint/parser": "^8.60.0",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.2.6",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3"
+  }
+}

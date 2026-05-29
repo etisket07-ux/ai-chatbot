@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__serena__write_memory",
+      "mcp__serena__edit_memory",
+      "mcp__context7__resolve-library-id",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(git init *)",
+      "Bash(gh repo *)",
+      "Bash(git config *)",
+      "Bash(git add *)",
+      "Bash(git commit -m 'Initial commit: Phase 1 complete - Project setup with Next.js, TypeScript, Hono, MongoDB, and Anthropic SDK *)"
+    ]
+  }
+}

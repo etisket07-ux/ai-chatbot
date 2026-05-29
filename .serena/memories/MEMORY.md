@@ -1,0 +1,9 @@
+- [Project Core](core.md) — AI chatbot with Claude API, Next.js + Hono, MongoDB Atlas, RAG-based responses
+- [Architecture](architecture.md) — System design: frontend, Hono backend, MongoDB, Claude API integration
+- [Tech Stack](tech_stack.md) — Next.js, Hono, Mongoose, MongoDB Atlas, @anthropic-ai/sdk, TypeScript
+- [Suggested Commands](suggested_commands.md) — Development, testing, lint, format, type-check, E2E tests
+- [Code Conventions](conventions.md) — TypeScript strict, file structure, API design, error handling, database patterns
+- [Database Schema](database_schema.md) — Mongoose collections: conversations (chat), manuals (RAG content)
+- [API Integration](api_integration.md) — Hono endpoints (/api/chat, /api/messages, /api/search-manuals), Claude SDK
+- [RAG Strategy](rag_strategy.md) — Retrieval augmented generation: search, scoring, context assembly, testing
+- [Task Completion](task_completion.md) — Pre-commit checks: types, lint, format, manual testing, E2E tests
