@@ -1,5 +1,5 @@
 /**
- * PDF → Markdown 변환 스크립트 (LlamaParse 사용)
+ * PDF → Markdown 변환 스크립트 (LlamaParse CLI 사용)
  *
  * 사용법:
  *   npm run pdf-to-md                        # manuals/ 전체 PDF 변환
@@ -11,13 +11,10 @@
  */
 import * as dotenv from 'dotenv';
 import { resolve, basename } from 'path';
-import { readdirSync, statSync, writeFileSync } from 'fs';
-import { createRequire } from 'module';
+import { readdirSync, statSync } from 'fs';
+import { execSync } from 'child_process';
 
 dotenv.config({ path: resolve(process.cwd(), '.env.local') });
-
-const require = createRequire(import.meta.url);
-const { LlamaParseReader } = require('llamaindex');
 
 const MANUALS_DIR = resolve(process.cwd(), 'manuals');
 const API_KEY = process.env.LLAMA_CLOUD_API_KEY;
@@ -40,37 +37,27 @@ function collectPdfs(dir: string): string[] {
   return results;
 }
 
-async function convertPdf(pdfPath: string): Promise<void> {
+function convertPdf(pdfPath: string): void {
   const mdPath = pdfPath.replace(/\.pdf$/i, '.md');
-  const fileName = basename(pdfPath);
+  console.log(`\n📄 변환 중: ${basename(pdfPath)}`);
 
-  console.log(`\n📄 변환 중: ${fileName}`);
+  execSync(
+    `uvx --with llama-parse llama-parse "${pdfPath}" --result-type markdown --output-file "${mdPath}"`,
+    {
+      env: { ...process.env, LLAMA_CLOUD_API_KEY: API_KEY! },
+      stdio: 'inherit',
+    }
+  );
 
-  const reader = new LlamaParseReader({
-    apiKey: API_KEY,
-    resultType: 'markdown',
-    language: 'ko',
-  });
-
-  const documents = await reader.loadData(pdfPath);
-  const content = documents.map((doc: { text: string }) => doc.text).join('\n\n');
-
-  writeFileSync(mdPath, content, 'utf-8');
-  console.log(`✅ 저장 완료: ${basename(mdPath)} (${content.length.toLocaleString()} chars)`);
+  console.log(`✅ 저장 완료: ${basename(mdPath)}`);
 }
 
-async function main() {
+function main() {
   const args = process.argv.slice(2);
 
-  let targets: string[] = [];
-
-  if (args.length > 0) {
-    // 특정 파일 지정
-    targets = args.map((a) => resolve(MANUALS_DIR, a));
-  } else {
-    // manuals/ 전체 PDF
-    targets = collectPdfs(MANUALS_DIR);
-  }
+  const targets = args.length > 0
+    ? args.map((a) => resolve(MANUALS_DIR, a))
+    : collectPdfs(MANUALS_DIR);
 
   const pdfs = targets.filter((f) => f.toLowerCase().endsWith('.pdf'));
 
@@ -79,14 +66,14 @@ async function main() {
     return;
   }
 
-  console.log(`\n🔍 ${pdfs.length}개 PDF 변환 시작...\n`);
+  console.log(`\n🔍 ${pdfs.length}개 PDF 변환 시작...`);
 
   let success = 0;
   let fail = 0;
 
   for (const pdf of pdfs) {
     try {
-      await convertPdf(pdf);
+      convertPdf(pdf);
       success++;
     } catch (err) {
       console.error(`❌ 실패: ${basename(pdf)} - ${err}`);
@@ -96,11 +83,8 @@ async function main() {
 
   console.log(`\n완료: 성공 ${success}개 / 실패 ${fail}개`);
   if (success > 0) {
-    console.log('\n변환된 .md 파일을 확인 후 npm run seed 로 DB에 업로드하세요.');
+    console.log('변환된 .md 파일 확인 후 npm run seed 로 DB에 업로드하세요.');
   }
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+main();
