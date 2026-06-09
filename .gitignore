@@ -38,3 +38,7 @@ Thumbs.db
 # Logs
 logs
 *.log
+
+# Manuals (업무 문서는 git에 포함하지 않음 - 필요 시 이 줄 삭제)
+manuals/**/*.txt
+manuals/**/*.md

@@ -13,7 +13,17 @@
       "Bash(git commit -m 'Initial commit: Phase 1 complete - Project setup with Next.js, TypeScript, Hono, MongoDB, and Anthropic SDK *)",
       "Bash(git commit -m ' *)",
       "Bash(claude mcp *)",
-      "Bash(npx @upstash/context7-mcp --help)"
+      "Bash(npx @upstash/context7-mcp --help)",
+      "Skill(run)",
+      "Bash(echo \"PID: $!\")",
+      "Bash(Start-Sleep -Seconds 8)",
+      "Bash(Invoke-WebRequest -Uri \"http://localhost:3000/api/health\" -UseBasicParsing)",
+      "Bash(Select-Object -ExpandProperty Content)",
+      "Bash(curl -s http://localhost:3000/api/health)",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(curl -s \"http://localhost:3000/api/messages?sessionId=test_session_xxx\")",
+      "Bash(curl *)",
+      "PowerShell(New-Item *)"
     ]
   },
   "enableAllProjectMcpServers": true,
