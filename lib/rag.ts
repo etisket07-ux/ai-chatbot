@@ -27,7 +27,7 @@ export async function searchManuals(query: string, limit = 5) {
 /**
  * Assemble RAG context from search results for Claude prompt
  */
-export function assembleContext(searchResults: any[]): string {
+export function assembleContext(searchResults: { title: string; category: string; content: string }[]): string {
   if (searchResults.length === 0) {
     return 'No relevant manual content found.';
   }

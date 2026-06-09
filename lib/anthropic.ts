@@ -1,41 +1,20 @@
 import Anthropic from '@anthropic-ai/sdk';
 
-if (!process.env.ANTHROPIC_API_KEY) {
-  throw new Error('ANTHROPIC_API_KEY is not set in environment variables');
+function getClient() {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) throw new Error('ANTHROPIC_API_KEY is not set in environment variables');
+  return new Anthropic({ apiKey });
 }
 
-export const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+export async function getChatResponse(userMessage: string, systemPrompt: string): Promise<string> {
+  const client = getClient();
+  const message = await client.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 1024,
+    system: systemPrompt,
+    messages: [{ role: 'user', content: userMessage }],
+  });
 
-/**
- * Get chat response from Claude API
- */
-export async function getChatResponse(
-  userMessage: string,
-  systemPrompt: string
-): Promise<string> {
-  try {
-    const message = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages: [
-        {
-          role: 'user',
-          content: userMessage,
-        },
-      ],
-    });
-
-    const content = message.content[0];
-    if (content.type === 'text') {
-      return content.text;
-    }
-
-    return 'Error: Unexpected response type from Claude API';
-  } catch (error) {
-    console.error('Error calling Claude API:', error);
-    throw error;
-  }
+  const content = message.content[0];
+  return content.type === 'text' ? content.text : 'Error: Unexpected response type';
 }

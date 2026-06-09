@@ -12,5 +12,9 @@
       "Bash(git add *)",
       "Bash(git commit -m 'Initial commit: Phase 1 complete - Project setup with Next.js, TypeScript, Hono, MongoDB, and Anthropic SDK *)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "context7"
+  ],
+  "enableAllProjectMcpServers": true
 }
