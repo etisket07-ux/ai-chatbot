@@ -10,11 +10,14 @@
       "Bash(gh repo *)",
       "Bash(git config *)",
       "Bash(git add *)",
-      "Bash(git commit -m 'Initial commit: Phase 1 complete - Project setup with Next.js, TypeScript, Hono, MongoDB, and Anthropic SDK *)"
+      "Bash(git commit -m 'Initial commit: Phase 1 complete - Project setup with Next.js, TypeScript, Hono, MongoDB, and Anthropic SDK *)",
+      "Bash(git commit -m ' *)",
+      "Bash(claude mcp *)",
+      "Bash(npx @upstash/context7-mcp --help)"
     ]
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "context7"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }

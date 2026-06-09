@@ -4,14 +4,16 @@ import { dbConnect } from '@/lib/mongodb';
 import { Conversation } from '@/lib/models/Conversation';
 import { searchManuals, assembleContext, generateSystemPrompt } from '@/lib/rag';
 import { getChatResponse } from '@/lib/anthropic';
+import { logger } from '@/lib/logger';
 
 const app = new Hono().basePath('/api');
 
 app.get('/health', (c) => {
-  return c.json({ status: 'ok' });
+  return c.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 app.post('/chat', async (c) => {
+  const start = Date.now();
   try {
     const body = await c.req.json();
     const { sessionId, message } = body as { sessionId?: string; message?: string };
@@ -40,9 +42,15 @@ app.post('/chat', async (c) => {
       { upsert: true, new: true }
     );
 
+    logger.info('chat request completed', {
+      sessionId,
+      manualHits: manualResults.length,
+      durationMs: Date.now() - start,
+    });
+
     return c.json({ sessionId, response: assistantResponse });
   } catch (error) {
-    console.error('Error in /api/chat:', error);
+    logger.error('Error in /api/chat', { error: String(error), durationMs: Date.now() - start });
     return c.json({ error: 'Internal server error', code: 'INTERNAL_ERROR' }, 500);
   }
 });
@@ -67,7 +75,7 @@ app.get('/messages', async (c) => {
     const messages = conversation.messages.slice(-limit);
     return c.json({ sessionId, messages });
   } catch (error) {
-    console.error('Error in /api/messages:', error);
+    logger.error('Error in /api/messages', { error: String(error) });
     return c.json({ error: 'Internal server error', code: 'INTERNAL_ERROR' }, 500);
   }
 });
@@ -94,7 +102,7 @@ app.post('/search-manuals', async (c) => {
 
     return c.json({ results: filtered });
   } catch (error) {
-    console.error('Error in /api/search-manuals:', error);
+    logger.error('Error in /api/search-manuals', { error: String(error) });
     return c.json({ error: 'Internal server error', code: 'INTERNAL_ERROR' }, 500);
   }
 });
