@@ -24,7 +24,8 @@
       "Bash(curl -s \"http://localhost:3000/api/messages?sessionId=test_session_xxx\")",
       "Bash(curl *)",
       "PowerShell(New-Item *)",
-      "Bash(npm uninstall *)"
+      "Bash(npm uninstall *)",
+      "Bash(uvx *)"
     ]
   },
   "enableAllProjectMcpServers": true,

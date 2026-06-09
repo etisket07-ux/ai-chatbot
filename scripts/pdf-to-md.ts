@@ -42,7 +42,7 @@ function convertPdf(pdfPath: string): void {
   console.log(`\n📄 변환 중: ${basename(pdfPath)}`);
 
   execSync(
-    `uvx --with llama-parse llama-parse "${pdfPath}" --result-type markdown --output-file "${mdPath}"`,
+    `uvx --with llama-cloud llama-parse "${pdfPath}" --result-type markdown --output-file "${mdPath}"`,
     {
       env: { ...process.env, LLAMA_CLOUD_API_KEY: API_KEY! },
       stdio: 'inherit',
@@ -56,7 +56,12 @@ function main() {
   const args = process.argv.slice(2);
 
   const targets = args.length > 0
-    ? args.map((a) => resolve(MANUALS_DIR, a))
+    ? args.map((a) => {
+        const inManuals = resolve(MANUALS_DIR, a);
+        const inCwd = resolve(process.cwd(), a);
+        if (statSync(inCwd).isFile()) return inCwd;
+        return inManuals;
+      })
     : collectPdfs(MANUALS_DIR);
 
   const pdfs = targets.filter((f) => f.toLowerCase().endsWith('.pdf'));
