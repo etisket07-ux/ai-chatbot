@@ -5,13 +5,16 @@
  *   manuals/파일명.txt          → 카테고리: "일반"
  *   manuals/카테고리/파일명.txt  → 카테고리: 폴더명
  *
- * 지원 형식: .txt, .md
+ * 지원 형식: .txt, .md, .pdf
  * 실행: npm run seed
  */
 import mongoose from 'mongoose';
 import * as dotenv from 'dotenv';
 import { resolve } from 'path';
 import { readdirSync, readFileSync, statSync } from 'fs';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const pdfParse = require('pdf-parse') as (buffer: Buffer) => Promise<{ text: string }>;
 
 dotenv.config({ path: resolve(process.cwd(), '.env.local') });
 
@@ -31,7 +34,7 @@ manualSchema.index({ content: 'text', title: 'text', category: 'text' });
 const Manual = mongoose.models.Manual || mongoose.model('Manual', manualSchema);
 
 const MANUALS_DIR = resolve(process.cwd(), 'manuals');
-const SUPPORTED = ['.txt', '.md'];
+const SUPPORTED = ['.txt', '.md', '.pdf'];
 
 interface ManualEntry {
   title: string;
@@ -39,7 +42,16 @@ interface ManualEntry {
   content: string;
 }
 
-function collectFiles(): ManualEntry[] {
+async function extractContent(filePath: string, ext: string): Promise<string> {
+  if (ext === '.pdf') {
+    const buffer = readFileSync(filePath);
+    const data = await pdfParse(buffer);
+    return data.text.trim();
+  }
+  return readFileSync(filePath, 'utf-8').trim();
+}
+
+async function collectFiles(): Promise<ManualEntry[]> {
   const entries: ManualEntry[] = [];
 
   for (const item of readdirSync(MANUALS_DIR)) {
@@ -47,21 +59,19 @@ function collectFiles(): ManualEntry[] {
     const stat = statSync(itemPath);
 
     if (stat.isDirectory()) {
-      // 카테고리 폴더
       const category = item;
       for (const file of readdirSync(itemPath)) {
-        const ext = file.slice(file.lastIndexOf('.'));
+        const ext = file.slice(file.lastIndexOf('.')).toLowerCase();
         if (!SUPPORTED.includes(ext)) continue;
-        const title = file.replace(/\.(txt|md)$/, '');
-        const content = readFileSync(resolve(itemPath, file), 'utf-8').trim();
+        const title = file.replace(/\.(txt|md|pdf)$/i, '');
+        const content = await extractContent(resolve(itemPath, file), ext);
         if (content) entries.push({ title, category, content });
       }
     } else {
-      // 루트에 바로 있는 파일 → 카테고리: "일반"
-      const ext = item.slice(item.lastIndexOf('.'));
+      const ext = item.slice(item.lastIndexOf('.')).toLowerCase();
       if (!SUPPORTED.includes(ext)) continue;
-      const title = item.replace(/\.(txt|md)$/, '');
-      const content = readFileSync(itemPath, 'utf-8').trim();
+      const title = item.replace(/\.(txt|md|pdf)$/i, '');
+      const content = await extractContent(itemPath, ext);
       if (content) entries.push({ title, category: '일반', content });
     }
   }
@@ -70,7 +80,7 @@ function collectFiles(): ManualEntry[] {
 }
 
 async function seed() {
-  const files = collectFiles();
+  const files = await collectFiles();
 
   if (files.length === 0) {
     console.log('manuals/ 폴더에 .txt 또는 .md 파일이 없습니다.');
