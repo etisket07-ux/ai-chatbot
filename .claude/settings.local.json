@@ -25,7 +25,9 @@
       "Bash(curl *)",
       "PowerShell(New-Item *)",
       "Bash(npm uninstall *)",
-      "Bash(uvx *)"
+      "Bash(uvx *)",
+      "Bash(git push *)",
+      "Bash(git rm *)"
     ]
   },
   "enableAllProjectMcpServers": true,

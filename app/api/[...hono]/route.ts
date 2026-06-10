@@ -24,7 +24,7 @@ app.post('/chat', async (c) => {
 
     await dbConnect();
 
-    const manualResults = await searchManuals(message, 5);
+    const manualResults = await searchManuals(message, 3);
     const ragContext = assembleContext(manualResults);
     const systemPrompt = generateSystemPrompt(ragContext);
 

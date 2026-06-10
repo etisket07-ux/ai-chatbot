@@ -1,11 +1,9 @@
 import { Manual } from './models/Manual';
 import { dbConnect } from './mongodb';
 
-/**
- * Search for relevant manual content based on user query
- * Used for RAG (Retrieval Augmented Generation)
- */
-export async function searchManuals(query: string, limit = 5) {
+const MAX_CONTENT_LENGTH = 2000;
+
+export async function searchManuals(query: string, limit = 3) {
   await dbConnect();
 
   try {
@@ -24,22 +22,22 @@ export async function searchManuals(query: string, limit = 5) {
   }
 }
 
-/**
- * Assemble RAG context from search results for Claude prompt
- */
 export function assembleContext(searchResults: { title: string; category: string; content: string }[]): string {
   if (searchResults.length === 0) {
     return 'No relevant manual content found.';
   }
 
   return searchResults
-    .map((result) => `## ${result.title} (${result.category})\n${result.content}`)
+    .map((result) => {
+      const content =
+        result.content.length > MAX_CONTENT_LENGTH
+          ? result.content.slice(0, MAX_CONTENT_LENGTH) + '...(이하 생략)'
+          : result.content;
+      return `## ${result.title} (${result.category})\n${content}`;
+    })
     .join('\n\n');
 }
 
-/**
- * Generate system prompt with RAG context
- */
 export function generateSystemPrompt(ragContext: string): string {
   return `You are a helpful company assistant with access to business manuals and documentation.
 You have expertise in company policies, procedures, and operational guidelines.

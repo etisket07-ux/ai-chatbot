@@ -9,9 +9,15 @@ function getClient() {
 export async function getChatResponse(userMessage: string, systemPrompt: string): Promise<string> {
   const client = getClient();
   const message = await client.messages.create({
-    model: 'claude-sonnet-4-6',
+    model: 'claude-haiku-4-5-20251001',
     max_tokens: 1024,
-    system: systemPrompt,
+    system: [
+      {
+        type: 'text',
+        text: systemPrompt,
+        cache_control: { type: 'ephemeral' },
+      },
+    ],
     messages: [{ role: 'user', content: userMessage }],
   });
 
